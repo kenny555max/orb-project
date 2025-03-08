@@ -1,0 +1,14 @@
+/* src/components/MediaCard/MediaCard.module.css */
+.card {
+    @apply relative overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px);
+}
+
+.imageWrapper {
+    @apply relative aspect-video bg-muted;
+}
