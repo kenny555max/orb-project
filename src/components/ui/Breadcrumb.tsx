@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react';
 
 export type BreadcrumbItem = {
     label: string;
-    href: string;
+    href?: string;
 };
 
 type BreadcrumbProps = {
@@ -21,9 +21,9 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
                 const isLast = index === items.length - 1;
 
                 return (
-                    <React.Fragment key={item.href}>
+                    <React.Fragment key={index}>
                         <Link
-                            href={item.href}
+                            href={item?.href ?? "/media-library"}
                             className={cn(
                                 "hover:text-blue-600 transition-colors",
                                 isLast ? "font-medium text-gray-900" : "text-gray-500"

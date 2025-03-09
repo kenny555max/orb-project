@@ -38,11 +38,11 @@ type FileWithPreview = {
 };
 
 export function FileUploadModal({
-                                    isOpen,
-                                    onClose,
-                                    onUploadFiles,
-                                    existingFiles = [],
-                                }: FileUploadModalProps) {
+    isOpen,
+    onClose,
+    onUploadFiles,
+    existingFiles = [],
+}: FileUploadModalProps) {
     const [selectedTab, setSelectedTab] = useState('upload');
     const [dragActive, setDragActive] = useState(false);
     const [filesToUpload, setFilesToUpload] = useState<FileWithPreview[]>([]);
@@ -261,6 +261,8 @@ export function FileUploadModal({
                                             <div className="h-14 w-14 shrink-0">
                                                 {fileItem.preview ? (
                                                     <Image
+                                                        width={100}
+                                                        height={100}
                                                         src={fileItem.preview}
                                                         alt={fileItem.file.name}
                                                         className="h-full w-full object-cover rounded"
@@ -331,6 +333,8 @@ export function FileUploadModal({
                                                 <Image
                                                     src={file.thumbnailUrl}
                                                     alt={file.name}
+                                                    width={100}
+                                                    height={100}
                                                     className="h-full w-full object-cover rounded-md"
                                                 />
                                             ) : (

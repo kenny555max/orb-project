@@ -27,7 +27,7 @@ const SidebarItem = ({ icon, label, href, isActive }: SidebarItemProps) => {
             href={href}
             className={cn(
                 "flex flex-col items-center w-full border-b border-gray-200 justify-center p-4 text-xs text-gray-500 hover:text-gray-900 transition-colors",
-                isActive && "text-blue-600"
+                isActive && "text-blue-600 border-l-[5px] border-l-blue-600"
             )}
         >
             <div className="mb-1">

@@ -1,4 +1,3 @@
-// components/media-library/FilterBar.tsx
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Search, ChevronDown, Filter } from 'lucide-react';
@@ -12,16 +11,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 type FilterBarProps = {
-    onSearch?: (query: string) => void;
-    onFilter?: (filter: string) => void;
+    onSearch: (query: string) => void;
+    onFilter: (filter: string) => void;
+    currentFilter: string;
+    searchValue: string;
     className?: string;
 };
 
-export function FilterBar({ onSearch, onFilter, className }: FilterBarProps) {
+export function FilterBar({
+                              onSearch,
+                              onFilter,
+                              currentFilter,
+                              searchValue,
+                              className
+                          }: FilterBarProps) {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (onSearch) {
-            onSearch(e.target.value);
-        }
+        onSearch(e.target.value);
     };
 
     return (
@@ -32,6 +37,7 @@ export function FilterBar({ onSearch, onFilter, className }: FilterBarProps) {
                     className="pl-10 h-10 w-full bg-white"
                     placeholder="Search..."
                     onChange={handleSearchChange}
+                    value={searchValue}
                 />
             </div>
 
@@ -39,30 +45,35 @@ export function FilterBar({ onSearch, onFilter, className }: FilterBarProps) {
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" className="h-10">
                         <Filter className="h-4 w-4 mr-2" />
-                        <span>Filter By</span>
+                        <span>
+                            {currentFilter === 'all'
+                                ? 'All Files'
+                                : currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1)}
+                        </span>
                         <ChevronDown className="h-4 w-4 ml-2" />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onFilter && onFilter('all')}>
+                    <DropdownMenuItem onClick={() => onFilter('all')}>
                         All Files
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onFilter && onFilter('images')}>
+                    <DropdownMenuItem onClick={() => onFilter('image')}>
                         Images
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onFilter && onFilter('documents')}>
+                    <DropdownMenuItem onClick={() => onFilter('document')}>
                         Documents
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onFilter && onFilter('audio')}>
+                    <DropdownMenuItem onClick={() => onFilter('audio')}>
                         Audio
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onFilter && onFilter('video')}>
+                    <DropdownMenuItem onClick={() => onFilter('video')}>
                         Video
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onFilter('folder')}>
+                        Folders
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
     );
 }
-
-export default FilterBar;

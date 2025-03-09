@@ -3,10 +3,10 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 COPY package*.json ./
-COPY pnpm-lock.yaml ./
-RUN corepack enable && pnpm install --frozen-lockfile
+COPY package-lock.json ./
+RUN corepack enable && npm install --frozen-lockfile
 COPY . .
-RUN pnpm build
+RUN npm build
 
 # Stage 2: Production
 FROM node:20-alpine AS production

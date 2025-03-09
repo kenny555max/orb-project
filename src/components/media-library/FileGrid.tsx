@@ -1,27 +1,32 @@
-// components/media-library/FileGrid.tsx
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { FileCard, FileItem } from './FileCard';
 import { Upload } from 'lucide-react';
+import { FileItem } from '@/app/media-library/page';
+import { FileCard } from './FileCard';
 
 type FileGridProps = {
-    files: FileItem[];
+    files?: FileItem[];
     selectedFiles?: string[];
     onSelectFile?: (id: string, selected: boolean) => void;
-    className?: string;
+    onOpenFolder?: (folderId: string) => void;
+    onOpenFile?: (fileId: string) => void;
+    onNavigateToFolder?: (folderId: string | null, folderName?: string) => void;
     isLoading?: boolean;
+    className?: string;
 };
 
 export function FileGrid({
-     files,
-     selectedFiles = [],
-     onSelectFile,
-     className,
-     isLoading = false
- }: FileGridProps) {
-
+                             files,
+                             selectedFiles = [],
+                             onSelectFile,
+                             onOpenFolder,
+                             onOpenFile,
+                             onNavigateToFolder,
+                             isLoading = false,
+                             className
+                         }: FileGridProps) {
     // Handle empty state
-    if (files.length === 0 && !isLoading) {
+    if (files?.length === 0 && !isLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-96 border-2 border-dashed rounded-lg p-12 text-center">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -56,16 +61,17 @@ export function FileGrid({
             "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4",
             className
         )}>
-            {files.map((file) => (
+            {files?.map((file) => (
                 <FileCard
                     key={file.id}
                     file={file}
                     isSelected={selectedFiles.includes(file.id)}
                     onSelect={onSelectFile}
+                    onOpenFolder={onOpenFolder}
+                    onOpenFile={onOpenFile}
+                    onNavigateToFolder={onNavigateToFolder}
                 />
             ))}
         </div>
     );
 }
-
-export default FileGrid;

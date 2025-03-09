@@ -1,4 +1,3 @@
-// components/media-library/AddNewButton.tsx
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
@@ -11,39 +10,32 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { FolderCreationModal } from './FolderCreationModal';
 import { FileUploadModal } from './FileUploadModal';
+import { FileItem } from '@/app/media-library/page';
 
 type AddNewButtonProps = {
-    onUploadFile?: (files: File[]) => void;
-    onCreateFolder?: (name: string, description?: string) => void;
+    onUploadFile: (files: File[]) => void;
+    onCreateFolder: (name: string, description?: string) => void;
+    existingFiles: FileItem[];
     className?: string;
-    existingFiles?: {
-        id: string;
-        name: string;
-        type: string;
-        thumbnailUrl?: string;
-        size: string;
-    }[];
 };
 
 export function AddNewButton({
                                  onUploadFile,
                                  onCreateFolder,
-                                 className,
-                                 existingFiles = []
+                                 existingFiles = [],
+                                 className
                              }: AddNewButtonProps) {
     const [folderModalOpen, setFolderModalOpen] = useState(false);
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
     const handleCreateFolder = (name: string, description?: string) => {
-        if (onCreateFolder) {
-            onCreateFolder(name, description);
-        }
+        onCreateFolder(name, description);
+        setFolderModalOpen(false);
     };
 
     const handleUploadFiles = (files: File[]) => {
-        if (onUploadFile) {
-            onUploadFile(files);
-        }
+        onUploadFile(files);
+        setUploadModalOpen(false);
     };
 
     return (
@@ -80,5 +72,3 @@ export function AddNewButton({
         </>
     );
 }
-
-export default AddNewButton;

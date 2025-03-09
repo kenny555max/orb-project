@@ -1,10 +1,11 @@
 // components/media-library/FileCard.tsx
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Folder, File, Music, Video } from 'lucide-react';
+import Image from 'next/image';
+import { Folder, File, Music, Video, FolderOpen } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
-import Image from "next/image";
+import { Button } from '@/components/ui/button';
 
 export type FileType = 'folder' | 'image' | 'audio' | 'video' | 'document' | 'other';
 
@@ -21,14 +22,41 @@ export type FileItem = {
 type FileCardProps = {
     file: FileItem;
     isSelected?: boolean;
+    onOpenFolder?: (folderId: string) => void;
     onSelect?: (id: string, selected: boolean) => void;
     className?: string;
+    onOpenFile?: (fileId: string) => void;
+    onNavigateToFolder?: (folderId: string | null, folderName?: string) => void;
 };
 
-export function FileCard({ file, isSelected = false, onSelect, className }: FileCardProps) {
+export function FileCard({
+                             onOpenFolder,
+                             onOpenFile,
+                             onNavigateToFolder,
+                             file,
+                             isSelected = false,
+                             onSelect,
+                             className
+                         }: FileCardProps) {
     const handleSelect = (checked: boolean) => {
         if (onSelect) {
             onSelect(file.id, checked);
+        }
+    };
+
+    const handleClick = () => {
+        if (file.type === 'folder' && onOpenFolder) {
+            onOpenFolder(file.id);
+        } else if (onOpenFile) {
+            onOpenFile(file.id);
+        }
+    };
+
+    const handleDoubleClick = () => {
+        if (file.type === 'folder' && onNavigateToFolder) {
+            onNavigateToFolder(file.id, file.name);
+        } else if (onOpenFile) {
+            onOpenFile(file.id);
         }
     };
 
@@ -58,33 +86,62 @@ export function FileCard({ file, isSelected = false, onSelect, className }: File
                 isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white",
                 className
             )}
+            onDoubleClick={handleDoubleClick}
         >
-            <div className="absolute top-2 right-2 z-10">
-                <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={handleSelect}
-                    className="h-4 w-4 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-                />
-            </div>
-
-            <div className="flex items-center justify-center h-32 mb-2 bg-gray-50 rounded overflow-hidden">
-                {file.type === 'image' && file.thumbnailUrl ? (
-                    <Image
-                        src={file.thumbnailUrl}
-                        alt={file.name}
-                        width={100}
-                        height={100}
-                        className="w-full h-full object-cover"
+            {onSelect && (
+                <div
+                    className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                    <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={handleSelect}
+                        className="border-2 border-gray-300 bg-white"
                     />
+                </div>
+            )}
+
+            <div
+                className="flex flex-col items-center justify-center p-3"
+                onClick={handleClick}
+            >
+                {file.type === 'image' && file.thumbnailUrl ? (
+                    <div className="w-full h-32 relative">
+                        <Image
+                            src={file.thumbnailUrl}
+                            alt={file.name}
+                            width={100}
+                            height={100}
+                            className="absolute inset-0 w-full h-full object-cover rounded-md"
+                        />
+                    </div>
                 ) : (
-                    renderFileIcon()
+                    <div className="h-32 flex items-center justify-center">
+                        {renderFileIcon()}
+                    </div>
                 )}
             </div>
 
-            <div className="mt-2">
-                <h3 className="text-sm font-medium text-gray-900 truncate">{file.name}</h3>
+            <div onClick={handleClick}>
+                <h3 className="font-medium text-gray-900 truncate mb-1">{file.name}</h3>
+                <div className="flex justify-between items-center text-xs text-gray-500">
+                    <span>{file.type === 'folder' ? 'Folder' : file.type.charAt(0).toUpperCase() + file.type.slice(1)}</span>
+                    {file.size && <span>{file.size}</span>}
+                </div>
                 <p className="text-xs text-gray-500 mt-1">{formattedDate}</p>
             </div>
+
+            {file.type === 'folder' && onNavigateToFolder && (
+                <div className="mt-2 pt-2 border-t border-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-xs flex items-center justify-center text-blue-600"
+                        onClick={() => onNavigateToFolder(file.id, file.name)}
+                    >
+                        <FolderOpen className="h-3 w-3 mr-1" />
+                        Open in Library
+                    </Button>
+                </div>
+            )}
         </div>
     );
 }
