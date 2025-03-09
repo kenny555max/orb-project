@@ -1,3 +1,20 @@
+/**
+ * @fileoverview Media Library page component for managing files and folders
+ * @module MediaLibraryPage
+ * @requires next/navigation
+ * @requires react
+ * @requires uuid
+ * @requires @/components/ui/Sidebar
+ * @requires @/components/ui/Header
+ * @requires @/components/ui/Breadcrumb
+ * @requires @/components/ui/Pagination
+ * @requires @/components/media-library/FilterBar
+ * @requires @/components/media-library/FileGrid
+ * @requires @/components/media-library/AddNewButton
+ * @requires @/components/media-library/FileViewModal
+ * @requires @/components/media-library/FolderViewModal
+ */
+
 'use client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useCallback, useEffect } from 'react';
@@ -12,6 +29,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { FileViewModal } from '@/components/media-library/FileViewModal';
 import { FolderViewModal } from '@/components/media-library/FolderViewModal';
 
+/**
+ * @typedef {Object} FileItem
+ * @property {string} id - Unique identifier for the file or folder
+ * @property {string} name - Name of the file or folder
+ * @property {string} type - Type of the item ('folder', 'image', 'audio', 'video', 'document')
+ * @property {Date} dateModified - Date when the file was last modified
+ * @property {string} [size] - Size of the file (for files only)
+ * @property {string} [thumbnailUrl] - URL to the thumbnail image (for images)
+ * @property {string} [description] - Description of the file or folder
+ * @property {string|null} [parentId] - ID of the parent folder (null for root items)
+ * @property {string} [path] - Full path of the file/folder
+ */
+
 // Extended FileItem type to handle parent folders and file paths
 export interface FileItem {
     id: string;
@@ -25,25 +55,96 @@ export interface FileItem {
     path?: string; // Full path of the file/folder
 }
 
+/**
+ * @typedef {Object} BreadcrumbItem
+ * @property {string|null} id - Unique identifier for the folder
+ * @property {string} name - Display name of the folder
+ * @property {string} [href] - URL to navigate to this folder
+ */
+
+/**
+ * Media Library Page Component
+ *
+ * Provides a comprehensive interface for browsing, viewing, and managing files and folders.
+ * Features include folder navigation, file filtering, pagination, file uploads, folder creation,
+ * and detailed file/folder views.
+ *
+ * @component
+ * @returns {React.ReactElement} The rendered Media Library page
+ */
 export default function MediaLibraryPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+
+    /**
+     * State for tracking selected files (by ID)
+     * @type {[string[], Function]} selectedFiles state and setter
+     */
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+
+    /**
+     * Current page number for pagination
+     * @type {[number, Function]} currentPage state and setter
+     */
     const [currentPage, setCurrentPage] = useState(1);
+
+    /**
+     * Current search query for filtering files
+     * @type {[string, Function]} searchQuery state and setter
+     */
     const [searchQuery, setSearchQuery] = useState('');
+
+    /**
+     * Current filter type ('all', 'image', 'audio', 'video', 'document', 'folder')
+     * @type {[string, Function]} filter state and setter
+     */
     const [filter, setFilter] = useState('all');
+
+    /**
+     * Loading state for file operations
+     * @type {[boolean, Function]} isLoading state and setter
+     */
     const [isLoading, setIsLoading] = useState(false);
+
+    /**
+     * ID of the current folder being viewed (null for root)
+     * @type {[string|null, Function]} currentFolderId state and setter
+     */
     const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+
+    /**
+     * History of folder navigation for breadcrumb
+     * @type {[Array<BreadcrumbItem>, Function]} folderHistory state and setter
+     */
     const [folderHistory, setFolderHistory] = useState<{id: string | null, name: string, href?: string}[]>([
         { id: uuidv4(), name: 'Root', href: '/media-library' }
     ]);
+
+    /**
+     * Currently selected file for detailed view
+     * @type {[FileItem|null, Function]} selectedFile state and setter
+     */
     const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+
+    /**
+     * Currently selected folder for detailed view
+     * @type {[FileItem|null, Function]} selectedFolder state and setter
+     */
     const [selectedFolder, setSelectedFolder] = useState<FileItem | null>(null);
 
     // Pagination settings
+    /** Number of items to display per page */
     const itemsPerPage = 10;
 
     // Generate a large sample dataset with 40+ files
+    /**
+     * Generates sample files and folders for demonstration
+     *
+     * Creates a structured dataset with root folders and nested files
+     * of various types (images, audio, video) with sample metadata.
+     *
+     * @returns {FileItem[]} Array of file and folder objects
+     */
     const generateSampleFiles = useCallback(() => {
         const rootFiles: FileItem[] = [
             {
@@ -135,9 +236,19 @@ export default function MediaLibraryPage() {
         return [...rootFiles, ...cakesFiles, ...dessertsFiles, ...musicFiles, ...videoFiles];
     }, []);
 
+    /**
+     * All files and folders in the library
+     * @type {[FileItem[], Function]} files state and setter
+     */
     const [files, setFiles] = useState<FileItem[]>(generateSampleFiles());
 
     // Function to create a new folder
+    /**
+     * Creates a new folder in the current directory
+     *
+     * @param {string} folderName - Name of the new folder
+     * @param {string} [description] - Optional description of the folder
+     */
     const handleCreateFolder = useCallback((folderName: string, description?: string) => {
         const newFolder: FileItem = {
             id: uuidv4(),
@@ -155,6 +266,11 @@ export default function MediaLibraryPage() {
     }, [currentFolderId, folderHistory]);
 
     // Function to upload files
+    /**
+     * Handles file uploads to the current directory
+     *
+     * @param {File[]} uploadedFiles - Array of File objects from file input
+     */
     const handleUploadFiles = useCallback((uploadedFiles: File[]) => {
         setIsLoading(true);
 
@@ -193,6 +309,12 @@ export default function MediaLibraryPage() {
     }, [currentFolderId, folderHistory]);
 
     // Handle selecting and deselecting files
+    /**
+     * Toggles selection state for a file
+     *
+     * @param {string} id - ID of the file to select/deselect
+     * @param {boolean} selected - Whether to select or deselect the file
+     */
     const handleSelectFile = (id: string, selected: boolean) => {
         if (selected) {
             setSelectedFiles([...selectedFiles, id]);
@@ -202,6 +324,11 @@ export default function MediaLibraryPage() {
     };
 
     // Handle opening a folder from the main grid
+    /**
+     * Handles opening a folder from the main grid
+     *
+     * @param {string} folderId - ID of the folder to open
+     */
     const handleOpenFolder = (folderId: string) => {
         const folder = files.find(file => file.id === folderId);
         if (folder) {
@@ -213,6 +340,12 @@ export default function MediaLibraryPage() {
     };
 
     // Handle navigating to a folder (changing the current directory)
+    /**
+     * Navigates to a folder, updating the URL and breadcrumb history
+     *
+     * @param {string|null} folderId - ID of the target folder (null for root)
+     * @param {string} [folderName] - Optional folder name (for breadcrumb navigation)
+     */
     const handleNavigateToFolder = useCallback((folderId: string | null, folderName?: string) => {
         if (folderId === currentFolderId) return;
 
@@ -252,7 +385,11 @@ export default function MediaLibraryPage() {
         setSelectedFolder(null); // Close folder modal if open
     }, [currentFolderId, folderHistory, files, router, searchParams]);
 
-    // Handle navigating to a previous folder via breadcrumb
+    /**
+     * Handles navigation via breadcrumb
+     *
+     * @param {number} index - Index in the folder history to navigate to
+     */
     const handleBreadcrumbNavigation = (index: number) => {
         const newHistory = folderHistory.slice(0, index + 1);
         setFolderHistory(newHistory);
@@ -261,6 +398,11 @@ export default function MediaLibraryPage() {
     };
 
     // Handle opening a file
+    /**
+     * Opens a file or folder for detailed view
+     *
+     * @param {string} fileId - ID of the file/folder to open
+     */
     const handleOpenFile = (fileId: string) => {
         const file = files.find(file => file.id === fileId);
         if (file && file.type !== 'folder') {
@@ -270,7 +412,10 @@ export default function MediaLibraryPage() {
         }
     };
 
-    // Filter and search files
+    /**
+     * Filtered files based on current folder, search query, and type filter
+     * @type {FileItem[]}
+     */
     const filteredFiles = files.filter(file => {
         // Filter by parent folder
         const inCurrentFolder = file.parentId === currentFolderId;
@@ -289,13 +434,19 @@ export default function MediaLibraryPage() {
         return inCurrentFolder && matchesSearch && matchesType;
     });
 
-    // Paginated files
+    /**
+     * Subset of filtered files for current pagination page
+     * @type {FileItem[]}
+     */
     const paginatedFiles = filteredFiles.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
 
-    // Convert folder history to breadcrumb items
+    /**
+     * Converts folder history to breadcrumb items for the UI
+     * @type {Array<{label: string, href?: string, onClick: Function}>}
+     */
     const breadcrumbItems = folderHistory.map((folder, index) => ({
         label: folder.name,
         href: folder.href,

@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Modal component for viewing folder details and contents
+ * @module FolderViewModal
+ * @requires react
+ * @requires lucide-react
+ * @requires date-fns
+ * @requires @/components/ui/dialog
+ * @requires @/components/ui/button
+ * @requires @/app/media-library/page
+ * @requires ./FileGrid
+ */
+
 'use client';
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
@@ -6,6 +18,18 @@ import { FileItem } from '@/app/media-library/page';
 import { Folder, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { FileGrid } from './FileGrid';
+
+/**
+ * Props for the FolderViewModal component
+ *
+ * @typedef {Object} FolderViewModalProps
+ * @property {FileItem} folder - The folder to display details for
+ * @property {FileItem[]} files - Array of all files in the media library
+ * @property {Function} onClose - Function to call when closing the modal
+ * @property {Function} onOpenFile - Function to call when a file is selected
+ * @property {Function} onOpenFolder - Function to call when a folder is selected
+ * @property {Function} onNavigateToFolder - Function to navigate to a folder in the main view
+ */
 
 interface FolderViewModalProps {
     folder: FileItem;
@@ -16,6 +40,17 @@ interface FolderViewModalProps {
     onNavigateToFolder: (folderId: string | null, folderName?: string) => void;
 }
 
+/**
+ * Modal component for viewing folder details and browsing folder contents
+ *
+ * Displays comprehensive information about a folder, including its metadata
+ * and contents. Users can view files within the folder, navigate to subfolders,
+ * and perform actions on the folder.
+ *
+ * @component
+ * @param {FolderViewModalProps} props - Component props
+ * @returns {React.ReactElement} The rendered modal component
+ */
 export function FolderViewModal({
     folder,
     files,
@@ -24,16 +59,27 @@ export function FolderViewModal({
     onOpenFolder,
     onNavigateToFolder
 }: FolderViewModalProps) {
-    //const [isLoading, setIsLoading] = useState(false);
-    //const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-
-    // Format the date for display
+    /**
+     * Format the folder's modification date as a relative time string
+     * @type {string}
+     */
     const formattedDate = formatDistanceToNow(new Date(folder.dateModified), { addSuffix: true });
 
-    // Filter files that belong to this folder
+    /**
+     * Filter the files that belong to this folder (based on parentId)
+     * @type {FileItem[]}
+     */
     const folderContents = files.filter(file => file.parentId === folder.id);
 
-    // Handle selecting files
+    /**
+     * Handles file selection within the folder view
+     *
+     * When a file is selected, it opens the file details view.
+     * When a folder is selected, it opens the folder details view.
+     *
+     * @param {string} id - ID of the selected file or folder
+     * @param {boolean} selected - Whether the item is being selected or deselected
+     */
     const handleSelectFile = (id: string, selected: boolean) => {
         // This is a simplified implementation since we're just viewing
         if (selected) {
@@ -49,6 +95,7 @@ export function FolderViewModal({
     return (
         <Dialog open={!!folder} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-auto">
+                {/* Dialog header with folder name and close button */}
                 <DialogHeader className="flex flex-row items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <Folder className="h-6 w-6 text-amber-500" />
@@ -64,22 +111,31 @@ export function FolderViewModal({
                 <div className="space-y-6">
                     {/* Folder information */}
                     <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-lg border">
+                        {/* Folder name */}
                         <div>
                             <h3 className="text-sm font-medium text-gray-500">Folder Name</h3>
                             <p className="text-base">{folder.name}</p>
                         </div>
+
+                        {/* Last modified date */}
                         <div>
                             <h3 className="text-sm font-medium text-gray-500">Last Modified</h3>
                             <p className="text-base">{formattedDate}</p>
                         </div>
+
+                        {/* Folder path */}
                         <div className="col-span-2">
                             <h3 className="text-sm font-medium text-gray-500">Folder Path</h3>
                             <p className="text-base font-mono text-sm text-gray-700">{folder.path || '/'}</p>
                         </div>
+
+                        {/* Item count */}
                         <div className="col-span-2">
                             <h3 className="text-sm font-medium text-gray-500">Items</h3>
                             <p className="text-base">{folderContents.length} items</p>
                         </div>
+
+                        {/* Optional folder description */}
                         {folder.description && (
                             <div className="col-span-2">
                                 <h3 className="text-sm font-medium text-gray-500">Description</h3>
@@ -92,10 +148,12 @@ export function FolderViewModal({
                     <div>
                         <h3 className="text-sm font-medium text-gray-500 mb-3">Folder Contents</h3>
                         {folderContents.length === 0 ? (
+                            // Empty state for folders with no contents
                             <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
                                 <p className="text-gray-500">This folder is empty</p>
                             </div>
                         ) : (
+                            // Grid display of folder contents
                             <FileGrid
                                 files={folderContents}
                                 onSelectFile={handleSelectFile}
@@ -103,7 +161,7 @@ export function FolderViewModal({
                         )}
                     </div>
 
-                    {/* Actions */}
+                    {/* Action buttons */}
                     <div className="flex justify-end space-x-3">
                         <Button
                             variant="secondary"
