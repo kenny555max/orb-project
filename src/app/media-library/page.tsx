@@ -519,6 +519,7 @@ export default function MediaLibraryPage() {
                             onFilter={setFilter}
                             currentFilter={filter}
                             searchValue={searchQuery}
+                            availableFiles={files.filter(file => file.parentId === currentFolderId)}
                         />
                     </div>
 
