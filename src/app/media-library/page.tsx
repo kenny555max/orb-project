@@ -118,7 +118,7 @@ export default function MediaLibraryPage() {
      * @type {[Array<BreadcrumbItem>, Function]} folderHistory state and setter
      */
     const [folderHistory, setFolderHistory] = useState<{id: string | null, name: string, href?: string}[]>([
-        { id: uuidv4(), name: 'Root', href: '/media-library' }
+        { id: uuidv4(), name: 'Root', href: '/media-library?folder=0' }
     ]);
 
     /**
@@ -492,7 +492,7 @@ export default function MediaLibraryPage() {
                 setFolderHistory(buildFolderPath(folderIdFromUrl));
             }
         }
-    }, [searchParams, files, pathname]);
+    }, [searchParams, files]);
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
