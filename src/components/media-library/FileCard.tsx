@@ -67,14 +67,14 @@ type FileCardProps = {
  * @returns {JSX.Element} Rendered FileCard component
  */
 export function FileCard({
-                             onOpenFolder,
-                             onOpenFile,
-                             onNavigateToFolder,
-                             file,
-                             isSelected = false,
-                             onSelect,
-                             className
-                         }: FileCardProps) {
+     onOpenFolder,
+     onOpenFile,
+     onNavigateToFolder,
+     file,
+     isSelected = false,
+     onSelect,
+     className
+ }: FileCardProps) {
     // Animation variants for the card
     const cardVariants = {
         initial: {
@@ -270,8 +270,8 @@ export function FileCard({
             {onSelect && (
                 <motion.div
                     className="absolute top-2 right-2 transition-opacity"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: isSelected ? 1 : 0 }}
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: isSelected ? 1 : 1 }}
                     whileHover={{ opacity: 1 }}
                 >
                     <Checkbox

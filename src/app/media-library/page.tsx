@@ -16,7 +16,7 @@
  */
 
 'use client';
-import { useRouter, useSearchParams } from 'next/navigation';
+import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import React, { useState, useCallback, useEffect } from 'react';
 import Sidebar from '@/components/ui/Sidebar';
 import Header from '@/components/ui/Header';
@@ -75,6 +75,7 @@ export interface FileItem {
 export default function MediaLibraryPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     /**
      * State for tracking selected files (by ID)
@@ -491,14 +492,14 @@ export default function MediaLibraryPage() {
                 setFolderHistory(buildFolderPath(folderIdFromUrl));
             }
         }
-    }, [searchParams, files]);
+    }, [searchParams, files, pathname]);
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50">
             <Header user={{ name: 'Sarah Knowles', image: '/placeholder-avatar.jpg' }} />
 
             <div className="flex-1 flex">
-                <Sidebar activeItem="applications" />
+                <Sidebar activeItem={pathname} />
 
                 <div className="flex-1 p-6 ml-24 mt-16">
                     <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">

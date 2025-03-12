@@ -47,7 +47,7 @@ export function Sidebar({ className, activeItem = 'dashboards' }: SidebarProps) 
     const items = [
         { icon: <Layers size={20} />, label: 'Dashboards', href: '/dashboards', id: 'dashboards' },
         { icon: <FileText size={20} />, label: 'Pages', href: '/pages', id: 'pages' },
-        { icon: <Grid size={20} />, label: 'Applications', href: '/applications', id: 'applications' },
+        { icon: <Grid size={20} />, label: 'Applications', href: '/media-library', id: 'applications' },
         { icon: <User size={20} />, label: 'UI', href: '/ui', id: 'ui' },
         { icon: <Menu size={20} />, label: 'Menu', href: '/menu', id: 'menu' },
         { icon: <File size={20} />, label: 'Blank Page', href: '/blank', id: 'blank' },
@@ -62,7 +62,7 @@ export function Sidebar({ className, activeItem = 'dashboards' }: SidebarProps) 
                     icon={item.icon}
                     label={item.label}
                     href={item.href}
-                    isActive={activeItem === item.id}
+                    isActive={activeItem === item.href}
                 />
             ))}
         </div>

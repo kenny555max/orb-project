@@ -6,7 +6,7 @@ COPY package*.json ./
 COPY package-lock.json ./
 RUN corepack enable && npm install --frozen-lockfile
 COPY . .
-RUN npm build
+RUN npm run build
 
 # Stage 2: Production
 FROM node:20-alpine AS production
@@ -21,4 +21,4 @@ COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/next-i18next.config.js ./
 
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]
